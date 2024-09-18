@@ -1,64 +1,24 @@
-import { StatusBar } from 'expo-status-bar';
-import { Component } from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Login from './src/screens/Login';
+import Home from './src/screens/Home';
+import User from './src/screens/User';
+import UserDetail from './src/screens/UserDetail';
 
-export default class App extends Component {
-  constructor(props) {
-    super(props);
+const Stack = createNativeStackNavigator();
 
-    this.state = {
-      loading: false,
-      usuario: [],
-      url: 'http://192.168.1.19:8080/api/users' // Cambia esto a la IP del servidor en red si usas un dispositivo físico
-    };
-  }
-
-  componentDidMount() {
-    this.getUser();
-  }
-
-  getUser = () => {
-    this.setState({ loading: true });
-    fetch(this.state.url)
-      .then(response => response.json())
-      .then(response => {
-        this.setState({
-          usuario: response.users,
-          loading: false
-        });
-      })
-      .catch(error => {
-        console.error(error);
-        this.setState({ loading: false });
-      });
-  };
-
-  render() {
-    if (this.state.loading) {
-      return (
-        <View style={styles.container}>
-          <Text>Loading...</Text>
-        </View>
-      );
-    }
-
-    return (
-      <View style={styles.container}>
-        <FlatList
-          data={this.state.usuario}
-          keyExtractor={item => item.User_id.toString()} // Asegúrate de que 'id' existe en los datos de usuario
-          renderItem={({ item }) => <Text>{item.User_nombre}</Text>}
-        />
-      </View>
-    );
-  }
+function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>   
+        <Stack.Screen name="User" component={User} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Home" component={Home} /> 
+        <Stack.Screen name="UserDetail" component={UserDetail} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
