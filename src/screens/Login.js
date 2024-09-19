@@ -35,12 +35,16 @@ const Login = ({ onLogin }) => {
       const user = users.find(u => u.User_correo === email);
 
       if (user) {
-       
+        // NOTA: Esta es una simulación de autenticación y NO es segura para producción
+        // En un entorno real, deberías enviar las credenciales al servidor para su verificación
         const isPasswordValid = verifyPassword(password, user.User_password);
 
         if (isPasswordValid) {
+          // Simular la generación de un token (en una aplicación real, esto se haría en el servidor)
           const fakeToken = 'fake-jwt-token-' + Math.random().toString(36).substr(2);
           await AsyncStorage.setItem('userToken', fakeToken);
+          
+          // Llamar a onLogin para actualizar el estado de autenticación
           onLogin();
         } else {
           Alert.alert('Error', 'Credenciales inválidas');
@@ -56,16 +60,20 @@ const Login = ({ onLogin }) => {
     }
   };
 
-
+  // Función para simular la verificación de contraseña
   const verifyPassword = (inputPassword, storedHash) => {
-   
+    // NOTA: Esta es una simulación y NO es segura para producción
+    // En un entorno real, esta verificación se haría en el servidor
+    
+    // Verificamos que el hash comience con $2y$10$ (formato de bcrypt)
     if (!storedHash.startsWith('$2y$10$')) {
       return false;
     }
-    return inputPassword.length >= 8; 
+
+    // Simulamos una comparación de contraseña
+    // En un entorno real, usaríamos bcrypt.compare o similar
+    return inputPassword.length >= 8; // Ejemplo: consideramos válida si tiene al menos 8 caracteres
   };
-
-
 
   return (
     <View style={styles.container}>
