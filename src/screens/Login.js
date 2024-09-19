@@ -3,7 +3,7 @@ import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-nativ
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Login = ({ navigation }) => {
+const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -36,14 +36,12 @@ const Login = ({ navigation }) => {
 
       if (user) {
        
-        const isPasswordValid = user.User_password.startsWith('$2y$10$');
+        const isPasswordValid = verifyPassword(password, user.User_password);
 
         if (isPasswordValid) {
           const fakeToken = 'fake-jwt-token-' + Math.random().toString(36).substr(2);
           await AsyncStorage.setItem('userToken', fakeToken);
-          
- 
-          navigation.navigate('User');
+          onLogin();
         } else {
           Alert.alert('Error', 'Credenciales inválidas');
         }
@@ -57,6 +55,17 @@ const Login = ({ navigation }) => {
       setIsLoading(false);
     }
   };
+
+
+  const verifyPassword = (inputPassword, storedHash) => {
+   
+    if (!storedHash.startsWith('$2y$10$')) {
+      return false;
+    }
+    return inputPassword.length >= 8; 
+  };
+
+
 
   return (
     <View style={styles.container}>
