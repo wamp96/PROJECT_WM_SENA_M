@@ -12,7 +12,7 @@ const User = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const response = await axios.get('https://skynetworkingsas.com/api/users');
+      const response = await axios.get('http://localhost:8080/api/users');
       setUsers(response.data.users);
       console.log('Fetched users:', response.data.users); 
     } catch (error) {

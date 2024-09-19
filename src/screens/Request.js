@@ -12,7 +12,7 @@ const Request = () => {
 
   const fetchRequests = useCallback(async () => {
     try {
-      const response = await axios.get('https://skynetworkingsas.com/api/request');
+      const response = await axios.get('http://localhost:8080/api/request');
       setRequests(response.data.requests);
     } catch (error) {
       console.error('Error fetching requests:', error);
