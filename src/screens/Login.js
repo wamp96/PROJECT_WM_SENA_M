@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -7,6 +7,21 @@ const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('https://skynetworkingsas.com/api/users');
+      setUsers(response.data.users);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      Alert.alert('Error', 'No se pudo obtener la lista de usuarios. Por favor, intente más tarde.');
+    }
+  };
 
   const handleLogin = async () => {
     if (email.trim() === '' || password.trim() === '') {
@@ -17,31 +32,27 @@ const Login = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/api/login', {
-        User_correo: email,
-        User_password: password,
-      });
+      const user = users.find(u => u.User_correo === email);
 
-      if (response.data.message === 'Login successful') {
-        // Guarda el token de autenticación
-        await AsyncStorage.setItem('userToken', response.data.token);
-        // Navega a la pantalla principal
-        navigation.replace('Home');
+      if (user) {
+       
+        const isPasswordValid = user.User_password.startsWith('$2y$10$');
+
+        if (isPasswordValid) {
+          const fakeToken = 'fake-jwt-token-' + Math.random().toString(36).substr(2);
+          await AsyncStorage.setItem('userToken', fakeToken);
+          
+ 
+          navigation.navigate('User');
+        } else {
+          Alert.alert('Error', 'Credenciales inválidas');
+        }
       } else {
-        Alert.alert('Error', 'Credenciales inválidas');
+        Alert.alert('Error', 'Usuario no encontrado');
       }
     } catch (error) {
       console.error(error);
-      if (error.response) {
-        // El servidor respondió con un estado fuera del rango de 2xx
-        Alert.alert('Error', error.response.data.error || 'Hubo un problema al iniciar sesión');
-      } else if (error.request) {
-        // La petición fue hecha pero no se recibió respuesta
-        Alert.alert('Error', 'No se pudo conectar con el servidor. Por favor, verifique su conexión a internet.');
-      } else {
-        // Algo sucedió al configurar la petición que provocó un error
-        Alert.alert('Error', 'Hubo un problema al iniciar sesión. Por favor, intente de nuevo.');
-      }
+      Alert.alert('Error', 'Hubo un problema al iniciar sesión. Por favor, intente de nuevo.');
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +66,7 @@ const Login = ({ navigation }) => {
         placeholder="Correo electrónico"
         value={email}
         onChangeText={setEmail}
-        keyboardType="email-address"
+        inputMode="email"
         autoCapitalize="none"
       />
       <TextInput
@@ -65,7 +76,7 @@ const Login = ({ navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <TouchableOpacity
+      <Pressable
         style={[styles.button, isLoading && styles.buttonDisabled]}
         onPress={handleLogin}
         disabled={isLoading}
@@ -73,7 +84,7 @@ const Login = ({ navigation }) => {
         <Text style={styles.buttonText}>
           {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 };
