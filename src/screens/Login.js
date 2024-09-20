@@ -3,7 +3,6 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'reac
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,7 +15,7 @@ const Login = ({ navigation }) => {
     }
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:8080/api/login', {
+      const response = await axios.post('https://skynetworkingsas.com/api/login', {
         User_correo: email,
         User_password: password,
       }
@@ -24,10 +23,10 @@ const Login = ({ navigation }) => {
 
       if (response.data.message === 'Login successful') {
         await AsyncStorage.setItem('userToken', response.data.token);
+      
         navigation.navigate('Home');
       } else {
-        Alert.alert('Error', 'Credenciales inválidas');
-        
+        Alert.alert('Error', 'Credenciales inválidas');  
       }
     } catch (error) {
       console.error(error);

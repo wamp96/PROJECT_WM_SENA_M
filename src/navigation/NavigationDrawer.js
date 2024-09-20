@@ -10,10 +10,9 @@ const Drawer = createDrawerNavigator();
 export default function NavigationDrawer() {
   return (
     <Drawer.Navigator>
+        <Drawer.Screen name= 'Login' component={Login}/>
         <Drawer.Screen name='Home' component={Home}/>
-        <Stack.Screen name= "Login" component={Login}/>
         <Drawer.Screen name='Settings' component={SettingsScreen}/>
-
     </Drawer.Navigator>
   )
 }
